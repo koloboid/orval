@@ -1,43 +1,43 @@
 import {
-  camel,
   ClientBuilder,
   ClientDependenciesBuilder,
   ClientHeaderBuilder,
+  GeneratorDependency,
+  GeneratorMutator,
+  GeneratorOptions,
+  GeneratorVerbOptions,
+  GetterParams,
+  GetterPropType,
+  GetterProps,
+  GetterResponse,
+  OutputClient,
+  OutputClientFunc,
+  PackageJson,
+  QueryOptions,
+  VERBS_WITH_BODY,
+  Verbs,
+  camel,
   generateFormDataAndUrlEncodedFunction,
   generateMutator,
   generateMutatorConfig,
   generateMutatorRequestOptions,
   generateOptions,
   generateVerbImports,
-  GeneratorDependency,
-  GeneratorMutator,
-  GeneratorOptions,
-  GeneratorVerbOptions,
-  GetterParams,
-  GetterProps,
-  GetterPropType,
-  GetterResponse,
+  getRouteAsArray,
   isObject,
   isSyntheticDefaultImportsAllow,
+  jsDoc,
   mergeDeep,
-  OutputClient,
-  OutputClientFunc,
-  PackageJson,
   pascal,
-  QueryOptions,
   stringify,
   toObjectString,
-  Verbs,
-  VERBS_WITH_BODY,
-  getRouteAsArray,
-  jsDoc,
 } from '@orval/core';
 import omitBy from 'lodash.omitby';
 import {
+  isVue,
   normalizeQueryOptions,
   vueMakeRouteReactive,
   vueWrapTypeWithMaybeRef,
-  isVue,
 } from './utils';
 
 const AXIOS_DEPENDENCIES: GeneratorDependency[] = [
@@ -730,13 +730,16 @@ const generateQueryImplementation = ({
     ? vueWrapTypeWithMaybeRef(toObjectString(props, 'implementation'))
     : toObjectString(props, 'implementation');
 
-  const httpFunctionProps = queryParam
-    ? props
-        .map(({ name }) =>
-          name === 'params' ? `{ ${queryParam}: pageParam, ...params }` : name,
-        )
-        .join(',')
-    : queryProperties;
+  const httpFunctionProps =
+    queryParam && props.some(({ name }) => name === queryParam)
+      ? props
+          .map(({ name }) =>
+            name === 'params'
+              ? `{ ${queryParam}: pageParam, ...params }`
+              : name,
+          )
+          .join(',')
+      : queryProperties;
 
   const returnType = generateQueryReturnType({
     outputClient,
@@ -784,7 +787,10 @@ const generateQueryImplementation = ({
 
   const queryFnArguments = getQueryFnArguments({
     hasQueryParam:
-      !!queryParam && props.some(({ type }) => type === 'queryParam'),
+      !!queryParam &&
+      props.some(
+        ({ type, name }) => type === 'queryParam' && name === queryParam,
+      ),
     hasSignal,
   });
 
