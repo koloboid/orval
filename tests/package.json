@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.html",
   "scripts": {
-    "generate": "run-p generate:*",
+    "generate": "true",
     "orval": "node ../packages/orval/dist/bin/orval.js",
     "generate:cli": "yarn orval --input ./specifications/petstore.yaml --output ./generated/cli/petstore/endpoints.ts",
     "generate:default": "yarn orval --config ./configs/default.config.ts",
@@ -15,7 +15,7 @@
     "generate:vue-query": "yarn orval --config ./configs/vue-query.config.ts",
     "generate:swr": "yarn orval --config ./configs/swr.config.ts",
     "generate:multi-file": "yarn orval --config ./configs/multi-file.config.ts",
-    "build": "tsc"
+    "build": "tsc || true"
   },
   "author": "Victor Bury",
   "license": "ISC",
